@@ -88,7 +88,7 @@ public class MidtermJavaTwo {
                         {
                             case"1":
                             {
-                                
+
                             }
                         }
 
@@ -130,16 +130,16 @@ public class MidtermJavaTwo {
 
                 GarageFileOut fileOut = new GarageFileOut("tickets.txt");
 
-                while (!carPort.carGarage.isEmpty()) {
+                while (!carPort.openTickets.isEmpty()) {
                     String line = "";
-                    line = line + carPort.getCar().getID() + "," + carPort.getCar().getTime().getHour();
+                    line = line + carPort.getTicket().getID() + "," + carPort.getTicket().getTime().getHour();
                     fileOut.fileWrite(line);
-                    carPort.getGarage().remove(0);
+                    carPort.getOpenTickets().remove(0);
                 }
 
                 fileOut.fileClose();
 
-                System.out.println("Total Revenue for the day: " + carPort.getTotalRevenue());
+                //System.out.println("Total Revenue for the day: " + carPort.getTotalRevenue());
                 return false;
 
             //ONE
