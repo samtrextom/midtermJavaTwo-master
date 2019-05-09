@@ -1,6 +1,9 @@
 
 package midtermjavatwo;
 
+import midtermjavatwo.BestValueParkingGarageFees.BestValuePaymentStructure;
+import midtermjavatwo.BestValueParkingGarageFees.BestValuePrintMenu;
+
 import java.io.File;
 import java.time.LocalTime;
 import java.util.Scanner;
@@ -13,169 +16,136 @@ public class MidtermJavaTwo {
 
     public static void main(String[] args) {
 
-    Scanner keyboard = new Scanner(System.in);
-    Boolean endProgram = true;
-    String usersChoice;
-    
-    //setting up new garage to park cars in
-    Garage carPort = new Garage();
+        Scanner keyboard = new Scanner(System.in);
+        Boolean endProgram = true;
+        String usersChoice;
+        BestValuePaymentStructure paymentStructure = new BestValuePaymentStructure();
+        BestValuePrintMenu printMenu = new BestValuePrintMenu();
+        Garage carPort = Garage.getInstance();
+        carPort.setPaymentStructure(paymentStructure);
 
-    File file = new File("tickets.txt");
-    if(file.exists())
-    {
-        GarageFileIn fileIn = new GarageFileIn("tickets.txt");
-        String line;
-        String[] wordArray;
+        File file = new File("tickets.txt");
+        if(file.exists())
+        {
+            GarageFileIn fileIn = new GarageFileIn("tickets.txt");
+            String line;
+            String[] wordArray;
 
-        while ((line = fileIn.fileReadLine()) != null) {
+            while ((line = fileIn.fileReadLine()) != null) {
 
-            if (line.isEmpty()) {
-                continue;
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                wordArray = line.split(",");
+
+                carPort.addCar(
+                        new Ticket(
+                                Integer.parseInt(wordArray[0]),
+                                LocalTime.of(Integer.parseInt(wordArray[1]),0)
+                        )
+                );
             }
 
-            wordArray = line.split(",");
-
-            carPort.addCar(
-                    new Car(
-                            Integer.parseInt(wordArray[0]),
-                            LocalTime.of(Integer.parseInt(wordArray[1]),0)
-                    )
-            );
+            fileIn.fileClose();
         }
 
-        fileIn.fileClose();
-    }
+        do{
+            printMenu.getMenuType("WELCOME").print();
+            printMenu.getMenuType("MAIN").print();
+            usersChoice = keyboard.nextLine();
 
-    do{
-        getMenuOne();
-        usersChoice = keyboard.nextLine();
-        
-        switch(usersChoice) {
-            case "1": getMenuTwo();
-            String choice2 = keyboard.nextLine();
-                switch(choice2) {
-                    
-                    case "1": 
-                    {
-                        Car c = new Car();
-                        carPort.addCar(c);
-                        c.Display();
-                        //Give User Car ID Number
-                    break;
+            switch(usersChoice) {
+                //two
+                case "1": printMenu.getMenuType("CHECKIN").print();
+                String choice2 = keyboard.nextLine();
+                    switch(choice2) {
+
+                        case "1":
+                        {
+                            Ticket c = new Ticket();
+                            carPort.addCar(c);
+                            c.Display();
+                            //Give User Ticket ID Number
+                        break;
+                        }
+                        //one
+                        case "2": printMenu.getMenuType("MAIN").print();
+                        break;
                     }
-                    case "2": getMenuOne();
-                    break;
-                }
-            break;
-                
-            case "2": getMenuThree();
-            String choice3 = keyboard.nextLine();
-                switch(choice3) {
-                    
-                    //Check out car
-                    case "1": checkOutCar();
-                    String cTicketNumber = keyboard.nextLine();
-                    carPort.leaveCar(Integer.parseInt(cTicketNumber));
-                    
-                    break;
-                        
-                    case "2": carPort.lostTicket();
-                    break;
-                        
-                        
-                    case "3": getMenuOne();
-                    break;
-                }
-            break;
-                //Close Garage Program
-            
-            case "3": carPort.displayAll();
-            break;
-            
-            //close garage
-            case "4": exitProgram(carPort);
-                endProgram =false;
-            break;
-                
-            default: getMenuOne();
-            break;
-        }
-        
-    }while (endProgram);
-        
-    
-    
+                break;
+                    //three
+                case "2": printMenu.getMenuType("CHECKOUT").print();
+                String choice3 = keyboard.nextLine();
+                    switch(choice3) {
+
+                        //Check out car
+                        //checkoutCar
+                        case "1": printMenu.getMenuType("PAYOPTION").print();
+                        String choice4 = keyboard.nextLine();
+
+                        switch(choice4)
+                        {
+                            case"1":
+                            {
+                                
+                            }
+                        }
+
+
+                        break;
+
+                        case "2": printMenu.getMenuType("MAIN").print();
+                        break;
+                    }
+                break;
+                    //Close Garage Program
+
+                case "3": carPort.displayAll();
+                break;
+
+                //close garage
+                case "4":
+                    endProgram = exitProgram(carPort);
+                break;
+                    //one
+                default: printMenu.getMenuType("MAIN").print();
+                break;
+            }
+
+        }while (endProgram);
     }
 
-    public static void menu()
-    {
-        System.out.println();
-        System.out.println("Best Value Parking Garage");
-        System.out.println("========================");
-        System.out.println();
-        System.out.println("Choose your option below: ");
-    }
     
-    public static void getMenuOne()
-    {
-        menu();
-        System.out.println("1 - Checking into the garage");
-        System.out.println("2 - Checking out of the garage");
-        System.out.println("3 - Check cars in the garage");
-        System.out.println("4 - Close Garage");
-    }
-    
-    public static void exitProgram(Garage carPort)
+    public static boolean exitProgram(Garage carPort)
     {
         Scanner keyboard = new Scanner(System.in);
         keyboard.nextLine();
         System.out.println("Are you sure you would like to exit the program? Y/N: ");
         String exitChoice = keyboard.nextLine();
         
-        switch(exitChoice.toUpperCase())
-        {
-            case "Y": System.out.println("Thank you for using Best Value Parking Garage");
+        switch(exitChoice.toUpperCase()) {
+            case "Y":
+                System.out.println("Thank you for using " + carPort.getGarageName());
 
                 GarageFileOut fileOut = new GarageFileOut("tickets.txt");
 
-                while(!carPort.carGarage.isEmpty())
-                {
+                while (!carPort.carGarage.isEmpty()) {
                     String line = "";
-                    line = line+carPort.getCar().getID()+","+carPort.getCar().getTime().getHour();
+                    line = line + carPort.getCar().getID() + "," + carPort.getCar().getTime().getHour();
                     fileOut.fileWrite(line);
                     carPort.getGarage().remove(0);
                 }
 
                 fileOut.fileClose();
 
-                System.out.println("Total Revenue for the day: "+carPort.getTotalRevenue());
+                System.out.println("Total Revenue for the day: " + carPort.getTotalRevenue());
+                return false;
 
-                break;
-                
-            case "N": getMenuOne();
+            //ONE
+            default:
+                return true;
         }
-    }
-    
-    public static void getMenuTwo()
-    {
-        menu();
-        System.out.println("1 - Check in Car");
-        System.out.println("2 - Return to Main Menu");
-    }
-    
-    public static void getMenuThree()
-    {
-        menu();
-        System.out.println("1 - Check out Car");
-        System.out.println("2 - Lost Ticket");
-        System.out.println("3 - Return to Main Menu");
-    }
-    
-    public static void checkOutCar()
-    {
-        System.out.println();
-        System.out.println("What was your Car's ticket number? ");
-        
     }
 }
 //

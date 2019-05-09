@@ -14,10 +14,13 @@ import java.time.LocalTime;
  *
  * @author asnopek
  */
-public class Car {
+public class Ticket {
     
     private LocalTime time;
     private int ID;
+    private boolean open;
+    private double total;
+    private PaymentType paymentType;
 
     //get methods
     //set methods
@@ -25,19 +28,23 @@ public class Car {
     
     //constructing car to get the data of date and time
     //whenever we make a new car, it sets it to the whatever the current time it
-    public Car()
+    public Ticket()
     {
-        int randTime;
-        randTime = (int)((Math.random()*5)+7);
+        int randTime = (int)((Math.random()*5)+7);
         System.out.println(randTime);
         this.time = LocalTime.of(randTime, 0);
         this.ID = 0;
     }
 
-    public Car(int i, LocalTime t)
+    public Ticket(int i, LocalTime t)
     {
         this.ID = i;
         this.time = t;
+    }
+
+    public Ticket(PaymentType paymentType)
+    {
+        this.paymentType = paymentType;
     }
     
     //returning the variable time
@@ -65,7 +72,29 @@ public class Car {
         System.out.println("You checked in at " + getTime().getHour() + ":00");
         System.out.println("Your car ticket number is: " + getID());
     }
-    
-    
-    
+
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
 }

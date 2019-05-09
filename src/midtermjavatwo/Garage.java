@@ -1,11 +1,13 @@
 package midtermjavatwo;
 
 
+import midtermjavatwo.BestValueParkingGarageFees.LostFee;
+import midtermjavatwo.BestValueParkingGarageFees.MinMaxFee;
+
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,123 +18,77 @@ import java.util.Scanner;
 
 /**
  *
- * @author asnopek
+ * @author asnopek and samtrextom
  */
 public class Garage {
-    
-    //arraylists to hold cars and money they earn
-    //<Car> declares its going to have cars in it
-    ArrayList<Car> carGarage = new ArrayList();
-    
-    //private double for total of money made
-    private double totalRevenue;
-    private int carCount;
-    Boolean carFound = false;
 
-    
+    private static Garage instance = null;
+
+    //arraylists to hold cars and money they earn
+    //<Ticket> declares its going to have cars in it
+    ArrayList<Ticket> openTickets = new ArrayList();
+    ArrayList<Ticket> closedTickets = new ArrayList();
+
+    private PaymentStructure paymentStructure;
+
+
     //method addCar
     //method leaveCar--> car out of array, check time for payment, equation and add to total bank
     //
     //
-    
-    public Garage()
+
+    public Garage(){}
+
+    public void setPaymentStructure(PaymentStructure paymentStructure)
     {
-        carCount = 0;
+        this.paymentStructure = paymentStructure;
     }
-    
-    
-    
-    public void addCar(Car c)
-    
+
+    public String getGarageName(){return paymentStructure.getName(); }
+
+
+    public void addCar(Ticket c)
     {
-        if(c.getID() == 0)
-        {
-            c.setID(carCount++);
-        }
-        carCount++;
-        
         //adding a car to the Arraylist carGarage
-        carGarage.add(c);
+        openTickets.add(c);
     }
-    
-    public void leaveCar(int ID)
+
+    public Ticket findTicket(int ID)
     {
-        double cost = 0;
-        int carPosition = 0;
-        for(int i = 0; i < carGarage.size(); i++)
-        {
-            if(carGarage.get(i).getID() == ID)
-            {
-                carPosition = i;
-                carFound = true;
-                Car c = carGarage.get(i);
-                
-                int randTime;
-                randTime =(int)(Math.random() * 10) + 13;
-                LocalTime leaveTime = LocalTime.of(randTime, 0);
-                Duration d = Duration.between(leaveTime, c.getTime());
-                
-                if (d.toHours() <= 3)
-                {
-                    cost = 5;
-                }
-                else if (d.toHours() <= 12)
-                {
-                    cost = 5 + (d.toHours() - 3);
-                }
-                else
-                {
-                    cost = 15;
-                }
-                
-                totalRevenue += cost;
-                System.out.println("Thank you for using Best Value Parking Garage");
-                System.out.println(d.toHours() + "hours parked");
-                System.out.println("Total Cost: $" + cost + "\n");
-                
+        for(int i = 0; i < openTickets.size(); i++) {
+            if (openTickets.get(i).getID() == ID) {
+                Ticket ticket = openTickets.get(i);
+                openTickets.remove(i);
+                ticket.setPaymentType(new MinMaxFee());
+                return ticket;
             }
         }
-        if (carFound)
-        {
-            carGarage.remove(carPosition);
-        }
-        else
-        {
-            System.out.println("Car not found!\n");
-        }
-        
-        
+        System.out.println("Ticket not found!\n");
+        return new Ticket(new LostFee());
     }
-    
-    public void lostTicket()
-    {
-        totalRevenue += 25;
-        System.out.println("Thank you for using Best Value Parking Garage");
-        System.out.println("You owe $25");
-    }
-    
+
     public void displayAll()
     {
-        for(int i = 0; i < carGarage.size(); i++)
+        for(int i = 0; i < openTickets.size(); i++)
         {
-            carGarage.get(i).Display();
+            openTickets.get(i).Display();
             System.out.println();
         }
     }
 
-    public Car getCar()
-    {
-        return carGarage.get(0);
-    }
+    public Ticket getTicket() { return openTickets.get(0); }
 
-    public List getGarage()
-    {
-        return carGarage;
-    }
+    public List getOpenTickets() { return openTickets; }
 
-    public double getTotalRevenue()
+    public List getClosedTickets() { return closedTickets; }
+
+    public static Garage getInstance()
     {
-        return totalRevenue;
+        if(instance == null)
+        {
+            instance = new Garage();
+        }
+        return instance;
     }
 
 }
