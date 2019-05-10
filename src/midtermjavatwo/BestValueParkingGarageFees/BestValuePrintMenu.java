@@ -5,6 +5,10 @@ import midtermjavatwo.PrintMenu;
 
 public class BestValuePrintMenu implements PrintMenu {
 
+    private static BestValuePrintMenu instance = null;
+
+    private BestValuePrintMenu(){}
+
     @Override
     public MenuType getMenuType(String menuType) {
         switch(menuType.toUpperCase())
@@ -39,4 +43,14 @@ public class BestValuePrintMenu implements PrintMenu {
             }
         }
     }
+
+    public static PrintMenu getInstance()
+    {
+        if(instance == null)
+        {
+            instance = new BestValuePrintMenu();
+        }
+        return instance;
+    }
+
 }

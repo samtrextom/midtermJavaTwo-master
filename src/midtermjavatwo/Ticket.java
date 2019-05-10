@@ -1,8 +1,10 @@
 package midtermjavatwo;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Random;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,9 +18,9 @@ import java.time.LocalTime;
  */
 public class Ticket {
     
-    private LocalTime time;
+    private LocalTime enterTime = LocalTime.of(0,0);
+    private LocalTime outTime;
     private int ID;
-    private boolean open;
     private double total;
     private PaymentType paymentType;
 
@@ -30,16 +32,17 @@ public class Ticket {
     //whenever we make a new car, it sets it to the whatever the current time it
     public Ticket()
     {
-        int randTime = (int)((Math.random()*5)+7);
-        System.out.println(randTime);
-        this.time = LocalTime.of(randTime, 0);
+        Random rand = new Random();
+        int randHour = rand.nextInt(6)+7;
+        //System.out.println(randTime);
+        this.enterTime = LocalTime.of(randHour, 0);
         this.ID = 0;
     }
 
     public Ticket(int i, LocalTime t)
     {
         this.ID = i;
-        this.time = t;
+        this.enterTime = t;
     }
 
     public Ticket(PaymentType paymentType)
@@ -50,7 +53,7 @@ public class Ticket {
     //returning the variable time
     public LocalTime getTime()
     {
-       return time;
+       return enterTime;
     }
     
     //returns whatever is in the int ID
@@ -73,22 +76,23 @@ public class Ticket {
         System.out.println("Your car ticket number is: " + getID());
     }
 
+    public void calculateTotal() {
 
-    public boolean isOpen() {
-        return open;
+        Random rand = new Random();
+        int randHour = rand.nextInt(11)+13;
+        outTime = LocalTime.of(randHour,0);
+
+        int hour = (int)Duration.between(enterTime,outTime).toHours();
+
+        total = paymentType.getPaymentTotal(hour);
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
+    public String displayOutTime()
+    {
+        return outTime.toString();
     }
 
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
+    public double getTotal(){return total;}
 
     public PaymentType getPaymentType() {
         return paymentType;

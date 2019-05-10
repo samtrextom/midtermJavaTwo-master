@@ -4,6 +4,7 @@ package midtermjavatwo;
 import midtermjavatwo.BestValueParkingGarageFees.LostFee;
 import midtermjavatwo.BestValueParkingGarageFees.MinMaxFee;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -26,18 +27,23 @@ public class Garage {
 
     //arraylists to hold cars and money they earn
     //<Ticket> declares its going to have cars in it
-    ArrayList<Ticket> openTickets = new ArrayList();
-    ArrayList<Ticket> closedTickets = new ArrayList();
+    private ArrayList<Ticket> openTickets = new ArrayList();
+    private ArrayList<Ticket> closedTickets = new ArrayList();
+
+
+    private TicketDataStorage ticketDataStorage = TicketDataStorage.getInstance();
+
+    private int totalLostTickets = 0;
 
     private PaymentStructure paymentStructure;
 
 
-    //method addCar
+    //method addTicket
     //method leaveCar--> car out of array, check time for payment, equation and add to total bank
     //
     //
 
-    public Garage(){}
+    private Garage(){}
 
     public void setPaymentStructure(PaymentStructure paymentStructure)
     {
@@ -47,7 +53,7 @@ public class Garage {
     public String getGarageName(){return paymentStructure.getName(); }
 
 
-    public void addCar(Ticket c)
+    public void addTicket(Ticket c)
     {
         //adding a car to the Arraylist carGarage
         openTickets.add(c);
@@ -59,11 +65,11 @@ public class Garage {
             if (openTickets.get(i).getID() == ID) {
                 Ticket ticket = openTickets.get(i);
                 openTickets.remove(i);
-                ticket.setPaymentType(new MinMaxFee());
                 return ticket;
             }
         }
         System.out.println("Ticket not found!\n");
+        totalLostTickets ++;
         return new Ticket(new LostFee());
     }
 
@@ -76,11 +82,63 @@ public class Garage {
         }
     }
 
-    public Ticket getTicket() { return openTickets.get(0); }
+    public void addLostTicket()
+    {
+        totalLostTickets++;
+    }
 
-    public List getOpenTickets() { return openTickets; }
+    public void addClosedTicket(Ticket ticket)
+    {
+        closedTickets.add(ticket);
+    }
 
-    public List getClosedTickets() { return closedTickets; }
+    public void openGarage()
+    {
+        File file = new File("tickets.txt");
+        if(file.exists())
+        {
+            GarageFileIn fileIn = new GarageFileIn("tickets.txt");
+            String line;
+
+            while ((line = fileIn.fileReadLine()) != null) {
+
+                if (line.isEmpty()) {
+                    continue;
+                }
+                ticketDataStorage.addExistingTotal(line);
+            }
+
+            fileIn.fileClose();
+        }
+    }
+
+    public void closeGarage()
+    {
+
+
+        if(!openTickets.isEmpty()) {
+            int remainingTickets = openTickets.size() - totalLostTickets;
+
+            for(int i = 0; i < remainingTickets; i++)
+            {
+                Ticket ticket = new Ticket(new LostFee());
+                ticket.calculateTotal();
+                closedTickets.add(ticket);
+            }
+        }
+        if(!closedTickets.isEmpty()) {
+            ticketDataStorage.addTotals(closedTickets);
+        }
+            GarageFileOut fileOut = new GarageFileOut("tickets.txt");
+            ticketDataStorage.displayAllTotals();
+
+            while (ticketDataStorage.hasTotal()) {
+                String line = ticketDataStorage.writeToFile(0);
+                fileOut.fileWrite(line);
+            }
+            fileOut.fileClose();
+
+    }
 
     public static Garage getInstance()
     {
